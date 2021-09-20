@@ -123,8 +123,9 @@ echo
 inotifywait -qm  --timefmt '%Y-%m-%dT%H:%M:%S' --event close_write --format '%T %w %f %e' /tmp/CURRENTPATH | while read datetime dir filename event; do
 
   if [[ ${dir} != _* ]]; then
-  	current=`cat /tmp/CURRENTPATH`
-        fullPath=`cat /tmp/FULLPATH`
+  	#current=`cat /tmp/CURRENTPATH`
+    current=`cat /tmp/CURRENTPATH | sed "s/\//_/g"` #added this as some consoles have a / in name, for example the Neo Geo core is listed as Neo Geo MVS/AES
+    fullPath=`cat /tmp/FULLPATH`
 
   	if [ "${current}" != "${lastPath}" ] && [ "${current}" != "" ]; then
           REPLY=""
