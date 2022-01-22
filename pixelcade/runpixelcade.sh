@@ -16,7 +16,6 @@ echo "${magenta}       Pixelcade LCD Launcher for MiSTer $version    ${white}"
 echo ""
 
 #echo "launching MiSTer front end integration"
-./MiSTerCade  #-s is for no ip
 HERE="$(dirname "$(readlink -f "${0}")")"
 
 saveIP=`cat /media/fat/pixelcade/ip.txt`
@@ -27,7 +26,9 @@ killall -9 announce 2>/dev/null
 
 if [ "${saveIP}" == "" ]; then
  echo "Finding Pixelcade"
- ${HERE}/pixelcadeFinder |grep Peer| tail -1| cut -d' ' -f2 > /media/fat/pixelcade/ip.txt
+ cd /media/fat/pixelcade
+ /media/fat/pixelcade/pixeljre/java/bin/java -jar pixelcadefindermister.jar
+ #${HERE}/pixelcadeFinder |grep Peer| tail -1| cut -d' ' -f2 > /media/fat/pixelcade/ip.txt
  echo "Pixelcade IP: `cat /media/fat/pixelcade/ip.txt`"
 else
  echo "Using saved Pixelcade: `cat /media/fat/pixelcade/ip.txt`"
