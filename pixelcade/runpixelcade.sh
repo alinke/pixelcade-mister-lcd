@@ -27,8 +27,8 @@ killall -9 announce 2>/dev/null
 if [ "${saveIP}" == "" ]; then
  echo "Finding Pixelcade"
  cd /media/fat/pixelcade
- /media/fat/pixelcade/pixeljre/bin/java -jar pixelcadefindermister.jar
- #${HERE}/pixelcadeFinder |grep Peer| tail -1| cut -d' ' -f2 > /media/fat/pixelcade/ip.txt
+ #/media/fat/pixelcade/pixeljre/bin/java -jar pixelcadefindermister.jar
+ ${HERE}/pixelcadeFinder |grep Peer| tail -1| cut -d' ' -f2 > /media/fat/pixelcade/ip.txt
  echo "Pixelcade IP: `cat /media/fat/pixelcade/ip.txt`"
 else
  echo "Using saved Pixelcade LCD IP Address: `cat /media/fat/pixelcade/ip.txt`"
@@ -39,12 +39,11 @@ fi
 if ping -c 1 $saveIP &> /dev/null
 then
   echo 1
-  echo "Pixelcade LCD Ping Test Succesfull"
+  echo "Pixelcade LCD Ping Test Succesful"
 else
   echo 0
-  echo "[ERROR] Cannot ping Pixelcade LCD, let's look for it again"
-  cd /media/fat/pixelcade
-  /media/fat/pixelcade/pixeljre/bin/java -jar pixelcadefindermister.jar
+  echo "[ERROR] Cannot ping Pixelcade LCD, let's look for it again..."
+  ${HERE}/pixelcadeFinder |grep Peer| tail -1| cut -d' ' -f2 > /media/fat/pixelcade/ip.txt
 fi
 
 nohup sh ${HERE}./pixelcadeLink.sh 2>/dev/null &
