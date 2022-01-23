@@ -38,7 +38,7 @@ fi
 # but let's do a connectivity test and make sure we are communicating
 
 if curl ${saveIP}:8080/v2/info | grep -q 'hostname'; then
-  echo "Pixelcade LCD Connectivity Succesful"
+  echo "Pixelcade LCD Connectivity Test Succesful"
 else
   echo "[ERROR] Cannot communicate with Pixelcade LCD, let's look for it again..."
   ${HERE}/pixelcadeFinder |grep Peer| tail -1| cut -d' ' -f2 > /media/fat/pixelcade/ip.txt
@@ -47,7 +47,7 @@ fi
 
 nohup sh ${HERE}./pixelcadeLink.sh 2>/dev/null &
 
-echo "Pixelcade is Ready and Running."
+echo "Pixelcade LCD is Ready and Running..."
+echo "Pixelcade LCD should now be changing as you scroll and launch games from the MiSTer arcade front end"
 
-echo "You can connect to the MiSTer @ MiSTer.local..."
 nohup $INSTALLDIR/announce 2>/dev/null & exit
