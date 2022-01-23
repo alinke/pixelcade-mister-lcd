@@ -35,16 +35,14 @@ else
  echo "Using saved Pixelcade LCD IP Address: `cat /media/fat/pixelcade/ip.txt`"
 fi
 
-# but let's do a ping and make sure the Pixelcade IP address is valid
+# but let's do a connectivity test and make sure we are communicating
 
-if ping -c 1 $saveIP &> /dev/null
-then
-  echo 1
-  echo "Pixelcade LCD Ping Test Succesful"
+if curl ${saveIP}:8080/v2/info | grep -q 'hostname'; then
+  echo "Pixelcade LCD Connectivity Succesful"
 else
-  echo 0
-  echo "[ERROR] Cannot ping Pixelcade LCD, let's look for it again..."
+  echo "[ERROR] Cannot communicate with Pixelcade LCD, let's look for it again..."
   ${HERE}/pixelcadeFinder |grep Peer| tail -1| cut -d' ' -f2 > /media/fat/pixelcade/ip.txt
+  saveIP=`cat /media/fat/pixelcade/ip.txt`
 fi
 
 nohup sh ${HERE}./pixelcadeLink.sh 2>/dev/null &
