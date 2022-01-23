@@ -30,6 +30,7 @@ if [ "${saveIP}" == "" ]; then
  #/media/fat/pixelcade/pixeljre/bin/java -jar pixelcadefindermister.jar
  ${HERE}/pixelcadeFinder |grep Peer| tail -1| cut -d' ' -f2 > /media/fat/pixelcade/ip.txt
  echo "Pixelcade IP: `cat /media/fat/pixelcade/ip.txt`"
+ saveIP=`cat /media/fat/pixelcade/ip.txt`
 else
  echo "Using saved Pixelcade LCD IP Address: `cat /media/fat/pixelcade/ip.txt`"
 fi
