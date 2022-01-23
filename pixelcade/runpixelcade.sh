@@ -16,34 +16,55 @@ EOF
 echo "${magenta}       Pixelcade LCD Launcher for MiSTer $version    ${white}"
 echo ""
 
-#echo "launching MiSTer front end integration"
-HERE="$(dirname "$(readlink -f "${0}")")"
-
-saveIP=`cat /media/fat/pixelcade/ip.txt`
-
-echo "Pixelcade is Starting..."
 killall -9 pixelcadeLink 2>/dev/null
 killall -9 announce 2>/dev/null
+HERE="$(dirname "$(readlink -f "${0}")")"
 
-if [ "${saveIP}" == "" ]; then
- echo "Finding Pixelcade"
- cd /media/fat/pixelcade
- ${HERE}/pixelcadeFinder |grep Peer| tail -1| cut -d' ' -f2 > /media/fat/pixelcade/ip.txt
- echo "Pixelcade IP: `cat /media/fat/pixelcade/ip.txt`"
- saveIP=`cat /media/fat/pixelcade/ip.txt`
-else
- echo "Using saved Pixelcade LCD IP Address: `cat /media/fat/pixelcade/ip.txt`"
+pixelcade-ip-search() {
+  echo "Looking for Pixelcade LCD..."
+  i=1
+  while [[ $i -lt 6 ]]
+  do
+    echo "Attempt: $i"
+    ((i++))
+    ${HERE}/pixelcadeFinder |grep Peer| tail -1| cut -d' ' -f2 > /media/fat/pixelcade/ip.txt
+    saveIP=`cat /media/fat/pixelcade/ip.txt`
+    if grep -q '[^[:space:]]' "/media/fat/pixelcade/ip.txt"; then
+      echo "FOUND Pixelcade LCD at ${saveIP}"
+      break
+    fi
+  done
+}
+
+pixelcade-connectivity-test() {
+  echo "Testing Pixelcade LCD Connectivity..."
+  if curl -m 10 ${saveIP}:8080/v2/info | grep -q 'hostname'; then
+    echo "Pixelcade LCD Connectivity Test Succesful at ${saveIP}"
+    connected=true
+  else
+    connected=false
+  fi
+}
+
+if ! grep -q '[^[:space:]]' "/media/fat/pixelcade/ip.txt"; then  #ip.txt is not there or is empty
+  pixelcade-ip-search
+else  #ip.txt is there and has a numbe in it so let's use it
+    echo "Using saved Pixelcade LCD IP Address: `cat /media/fat/pixelcade/ip.txt`"
+    saveIP=`cat /media/fat/pixelcade/ip.txt`
 fi
 
-# but let's do a connectivity test and make sure we are communicating
-echo "Looking for Pixelcade LCD on ${saveIP}"
-if curl -m 10 ${saveIP}:8080/v2/info | grep -q 'hostname'; then
-  echo "Pixelcade LCD Connectivity Test Succesful at ${saveIP}"
-  connected=true
+if grep -q '[^[:space:]]' "/media/fat/pixelcade/ip.txt"; then #if ip.txt is there, let's do a connectivity test
+  echo "Testing Pixelcade LCD Connectivity..."
+  if curl -m 10 ${saveIP}:8080/v2/info | grep -q 'hostname'; then
+    echo "Pixelcade LCD Connectivity Test Succesful at ${saveIP}"
+    connected=true
+  else
+    echo "[ERROR] Cannot communicate with Pixelcade LCD, let's try searching again..."
+    pixelcade-ip-search
+    pixelcade-connectivity-test
+  fi
 else
-  echo "[ERROR] Cannot communicate with Pixelcade LCD, let's look for it again..."
-  #${HERE}/pixelcadeFinder |grep Peer| tail -1| cut -d' ' -f2 > /media/fat/pixelcade/ip.txt
-  #saveIP=`cat /media/fat/pixelcade/ip.txt`
+  echo "[ERROR] Skipping Pixelcade LCD connecity test as we can't find Pixelcade LCD's IP address"
   connected=false
 fi
 
@@ -54,6 +75,6 @@ if [ "${connected}" = true ]; then
   echo "Pixelcade LCD should now be changing as you scroll and launch games from the MiSTer arcade front end"
 else
   echo "[ERROR] Could not connect to your Pixelcade LCD..."
-  echo "Please try running again this command:"
+  echo "Please try running this command again:"
   echo "cd /media/fat/pixelcade && ./runpixelcade.sh"
 fi
