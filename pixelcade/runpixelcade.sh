@@ -38,7 +38,7 @@ fi
 # but let's do a connectivity test and make sure we are communicating
 
 if curl ${saveIP}:8080/v2/info | grep -q 'hostname'; then
-  echo "Pixelcade LCD Connectivity Test Succesful"
+  echo "Pixelcade LCD Connectivity Test Succesful at ${saveIP}"
 else
   echo "[ERROR] Cannot communicate with Pixelcade LCD, let's look for it again..."
   ${HERE}/pixelcadeFinder |grep Peer| tail -1| cut -d' ' -f2 > /media/fat/pixelcade/ip.txt
